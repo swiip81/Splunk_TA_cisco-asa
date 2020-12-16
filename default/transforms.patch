@@ -1,0 +1,29 @@
+--- transforms.conf	2020-10-06 10:18:49.000000000 +0100
++++ transforms.conf.new	2020-12-16 21:24:17.116300479 +0000
+@@ -5,9 +5,16 @@
+ ##
+ [force_sourcetype_for_cisco_asa]
+ DEST_KEY = MetaData:Sourcetype
+-REGEX =  %(?:ASA|FTD)-\d+-\d{6}
++#REGEX =  %(?:ASA|FTD)-\d+-\d{6}
++REGEX =  %(ASA|FTD[\w-]*)-\d+-(\d{6}):
+ FORMAT = sourcetype::cisco:asa
+ 
++[add_msgid_to_sourcetype]
++REGEX =  %(ASA|FTD[\w-]*)-\d+-(\d{6}):
++DEST_KEY = MetaData:Sourcetype
++FORMAT = sourcetype::cisco:asa:$2
++DEFAULT_VALUE = cisco:asa
++
+ ##############
+ ## Look-ups ##
+ ##############
+@@ -36,7 +43,7 @@
+ match_type = WILDCARD(message_id)
+ 
+ [cisco_asa_log_level_message_id]
+-REGEX = %(?:ASA|FTD)-(?<log_level>\d+)-(?<message_id>\d+)
++REGEX = %(?:[ASA|FTD][\w-]*)-(?<log_level>\d+)-(?<message_id>\d+)
+ 
+ [cisco_asa_message_id_302014_302016]
+ REGEX = -30201[46]:\s*(\S+)\s+(\S+)\s+connection\s+(\d+)\s+for\s+([^:\s]+)\s*:\s*(?:((?:[\d+.]+|[a-fA-F0-9]*:[a-fA-F0-9]*:[a-fA-F0-9:]*))|(\S+))\s*\/\s*(\d{1,5})(?:\s*\(\s*(?:([\S^\\]+)\\)?([\w\-_]+)\s*\))?\s+to\s+([^:\s]+)\s*:\s*(?:((?:[\d+.]+|[a-fA-F0-9]*:[a-fA-F0-9]*:[a-fA-F0-9:]*))|(\S+))\s*\/\s*(\d{1,5})(?:\s*\(\s*(?:([\S^\\]+)\\)?([\w\-_]+)\s*\))?\s+[Dd]uration:?\s*(?:(\d+)[dD])?\s*(\d+)[Hh]?\s*:\s*(\d+)[Mm]?\s*:\s*(\d+)[Ss]?\s+bytes\s+(\d+)\s*(?:(.+?(?=\s+from))\s+from\s+(\S+)|([^\(]+))?\s*(?:\(\s*([^\)\s]+)\s*\))?
